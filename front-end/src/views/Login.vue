@@ -32,7 +32,7 @@
                     </v-form>
                   </v-card-text>
                   <div class="text-center mt-3">
-                    <v-btn rounded color="teal accent-3" dark>
+                    <v-btn rounded color="teal accent-3" dark @click="goToHome">
                       Registrar
                     </v-btn>
                   </div>
@@ -96,7 +96,9 @@
                   </v-card-text>
 
                   <div class="text-center mt-3">
-                    <v-btn rounded color="teal accent-3" dark>Empezar</v-btn>
+                    <v-btn rounded color="teal accent-3" dark @click="goToHome">
+                      Empezar
+                    </v-btn>
                   </div>
                 </v-col>
               </v-row>
@@ -118,6 +120,12 @@ export default {
 
   props: {
     source: String
+  },
+
+  methods: {
+    goToHome() {
+      this.$router.push({ path: "/home/false" });
+    }
   }
 };
 </script>

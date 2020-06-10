@@ -5,7 +5,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    rol: undefined
+    rol: true
   },
   mutations: {
     SET_ROL_STATE(state, rol) {
