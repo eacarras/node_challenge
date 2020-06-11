@@ -3,6 +3,7 @@ import VueRouter from "vue-router";
 
 import Login from "../views/Login.vue";
 import Home from "../views/Home.vue";
+import AdminPage from "../views/AdminPage.vue";
 
 Vue.use(VueRouter);
 
@@ -21,6 +22,11 @@ const routes = [
     path: "/home/:isAdmin",
     name: "Home",
     component: Home
+  },
+  {
+    path: "/adminPage",
+    name: "Reports",
+    component: AdminPage
   }
 ];
 

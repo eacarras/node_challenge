@@ -3,6 +3,18 @@
     <TopBar />
     <!-- Logic for all the restaurants -->
     <v-layout wrap>
+      <v-row class="center">
+        <v-card>
+          <v-card-actions>
+            <v-btn text @click="getInfo('getMostVoted')">Mas votados</v-btn>
+            <v-btn text @click="getInfo('getMostVotedByDepartment')">Mas votados por Departamento</v-btn>
+            <v-btn text @click="getInfo('getNumberEmployee')">Numero de empleados</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-row>
+      <v-row>
+        <h4 v-if="number">Numero de empleados: {{ number }}</h4>
+      </v-row>
       <v-card
         class="black--text"
         v-for="worker in data"
@@ -65,31 +77,43 @@ export default {
 
   data: () => ({
     data: [],
+    number: undefined,
     stringLike: "Felicidades has votado por: "
   }),
 
   mounted() {
-    fetch(process.env.VUE_APP_URL_API_REST + "getAllEmployees", {
-      method: "GET",
-      headers: {
-        "Accept": "application/json",
-        "Content-type": "application/json"
-      }
-    })
-      .then(res => res.json())
-      .then(response => {
-        if (response.status === 200) {
-          Object.keys(response.data).forEach((key) => 
-            this.data.push({
-              ...response.data[key],
-              id: key,
-              iconShow: true
-            })
-          );
-        };
-      })
-      // eslint-disable-next-line no-console
-      .catch(err => console.log(err))
+    this.getInfo("getMostVoted");
   },
+
+  methods: {
+    getInfo(value) {
+      this.data = [];
+      fetch(process.env.VUE_APP_URL_API_REST + value, {
+        method: "GET",
+        headers: {
+          "Accept": "application/json",
+          "Content-type": "application/json"
+        }
+      })
+        .then(res => res.json())
+        .then(response => {
+          if (value === "getNumberEmployee") {
+            if (response.status === 200) {
+              this.number = response.value;
+            }
+          } else if (response.status === 200) {
+            Object.keys(response.data).forEach((key) => 
+              this.data.push({
+                ...response.data[key],
+                id: key,
+                iconShow: true
+              })
+            );
+          };
+        })
+        // eslint-disable-next-line no-console
+        .catch(err => console.log(err))
+    }
+  }
 };
 </script>
