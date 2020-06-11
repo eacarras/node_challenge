@@ -17,22 +17,41 @@
                     </h4>
                     <v-form>
                       <v-text-field
+                        v-model="name"
+                        label="Nombre"
+                        prepend-icon="person"
+                        type="text"
+                        color="teal accent-3"
+                      />
+                      <v-text-field
+                        v-model="email"
                         label="E-mail"
                         prepend-icon="email"
                         type="text"
                         color="teal accent-3"
                       />
                       <v-text-field
-                        id="password"
+                        v-model="pass"
                         label="Contrasena"
                         prepend-icon="lock"
                         type="password"
                         color="teal accent-3"
                       />
+                      <v-text-field
+                        v-model="department"
+                        label="Departamento"
+                        prepend-icon="job"
+                        type="text"
+                        color="teal accent-3"
+                      />
+                      <v-checkbox
+                        v-model="checkbox"
+                        label="Admin"
+                      />
                     </v-form>
                   </v-card-text>
                   <div class="text-center mt-3">
-                    <v-btn rounded color="teal accent-3" dark @click="goToHome">
+                    <v-btn rounded color="teal accent-3" dark @click="insertPerson">
                       Registrar
                     </v-btn>
                   </div>
@@ -79,13 +98,14 @@
                     </h4>
                     <v-form>
                       <v-text-field
+                        v-model="email"
                         label="E-mail"
                         prepend-icon="email"
                         type="text"
                         color="teal accent-3"
                       />
                       <v-text-field
-                        id="password"
+                        v-model="pass"
                         label="Contrasena"
                         prepend-icon="lock"
                         type="password"
@@ -96,7 +116,12 @@
                   </v-card-text>
 
                   <div class="text-center mt-3">
-                    <v-btn rounded color="teal accent-3" dark @click="goToHome">
+                    <v-btn
+                      rounded
+                      color="teal accent-3"
+                      dark
+                      @click="validateCredentials"
+                    >
                       Empezar
                     </v-btn>
                   </div>
@@ -115,16 +140,92 @@ export default {
   name: "Login",
 
   data: () => ({
-    step: 1
+    step: 1,
+    data: [],
+    email: undefined,
+    pass: undefined,
+    department: undefined,
+    checkbox: false,
+    name: undefined
   }),
 
   props: {
     source: String
   },
 
+  mounted() {
+    fetch(process.env.VUE_APP_URL_API_REST + "getAllEmployees", {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-type": "application/json"
+      }
+    })
+      .then(res => res.json())
+      .then(response => {
+        if (response.status === 200) {
+          Object.keys(response.data).forEach(key => 
+            this.data.push({
+              ...response.data[key],
+              id: key,
+              iconShow: true
+            })
+          );
+        };
+      })
+      // eslint-disable-next-line no-console
+      .catch(err => console.log(err))
+  },
+
   methods: {
+    validateCredentials() {
+      if (this.email && this.pass) {
+        const filterObj = this.data.filter((e) => e.email === this.email && e.pass === this.pass);
+        
+        if (filterObj.length && filterObj[0].rol === "Admin") this.goToHomeAdmin();
+        else if (filterObj.length) this.goToHome();
+      }
+    },
+
+    insertPerson() {
+      if (this.email && this.pass && this.department) {
+        // eslint-disable-next-line no-console
+        const newInfo = {
+          data :{
+            department: this.department,
+            email: this.email,
+            name: this.name,
+            pass: this.pass,
+            rol: this.checkbox ? "Admin": "Not Admin",
+            voteDepartment: [],
+            votes: 0,
+          }
+        }
+
+        fetch(process.env.VUE_APP_URL_API_REST + "insertUser", {
+          method: "POST",
+          body: JSON.stringify(newInfo),
+          headers: {
+            Accept: "application/json",
+            "Content-type": "application/json"
+          }
+        })
+          .then(res => res.json())
+          .then(response => {
+            if (this.checkbox && response.status) this.goToHomeAdmin();
+            else this.goToHome()
+          })
+          // eslint-disable-next-line no-console
+          .catch(err => console.log(err))
+      }
+    },
+
     goToHome() {
       this.$router.push({ path: "/home/false" });
+    },
+
+    goToHomeAdmin() {
+      this.$router.push({ path: "/home/true" });
     }
   }
 };

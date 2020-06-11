@@ -6,9 +6,13 @@
 
       <v-spacer></v-spacer>
 
-      <v-toolbar-title style="cursor:pointer;">Votar</v-toolbar-title>
+      <v-toolbar-title style="cursor:pointer;" @click="goToVotes">Votar</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-toolbar-title v-if="true" style="cursor:pointer;">
+      <v-toolbar-title
+        v-if="this.$route.params.isAdmin === 'true'"
+        style="cursor:pointer;"
+        @click="goToAdminPage"
+      >
         Obtener reporte de votos
       </v-toolbar-title>
     </v-toolbar>
@@ -16,16 +20,15 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
-
 export default {
-  computed: {
-    ...mapGetters({ adminRol: "getRol" })
-  },
+  methods: {
+    goToAdminPage() {
+      this.$router.push({ path: "/adminPage" });
+    },
 
-  mounted() {
-    // eslint-disable-next-line no-console
-    console.log(this.adminRol);
+    goToVotes() {
+      this.$router.push({ path: "/home/true" });
+    }
   }
-};
+}
 </script>

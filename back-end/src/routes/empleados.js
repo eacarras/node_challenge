@@ -43,7 +43,7 @@ router.get('/getNumberEmployee', (_, res) => {
 router.get('/getMostVotedByDepartment', (req, res) => {
     const amount = req.query.amount ? req.query.amount : 1;
 
-    db.ref('user').once('value', (snapshot) => {
+    db.ref('user').on('value', (snapshot) => {
         data = snapshot.val();
         let finalObj = {};
         let dataToResponse = {};
@@ -108,7 +108,30 @@ router.get('/getMostVoted', (req, res) => {
             status: 500
         })
     });
-})
+});
+
+router.post('/insertUser', (req, res) => {
+    const { data } = req.body;
+    const newPostKey = db.ref().child('user').push().key;
+
+    var updates = {};
+    updates['/user/' + newPostKey] = data;
+
+    db.ref().update(updates)
+    .then(() => {
+        console.log("Datos ingresados!");
+        res.json({
+            status: 200,
+            msg: 'Datos Ingresados!'
+        });
+    }).catch((e) => {
+        console.error("Error al ingresar los datos", e);
+        res.json({
+            status: 500,
+            msg: 'Error al actualizar datos..'
+        })
+    });
+});
 
 router.post('/updateField', (req, res) => {
     const { data } = req.body;
